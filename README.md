@@ -1,2 +1,4 @@
 # I-EM_Cloud
-I-EM
+
+
+Questa repository contiene il codice relativo alla containerizzazione dei bot telegram tramite Docker
