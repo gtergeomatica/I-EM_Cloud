@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "postgres" <<-EOSQL
+    CREATE USER ${DBUSERNAME} WITH PASSWORD '${DBUSERPASSWORD}';
+	CREATE DATABASE ${DBNAME};
+EOSQL
+
+psql -v ON_ERROR_STOP=1 --username "postgres" -d ${DBNAME} <<-EOSQL
+    CREATE EXTENSION postgis;
+EOSQL
+
+psql -v ON_ERROR_STOP=0 --username "postgres" -d ${DBNAME} < ${DUMPPATH}/${SOURCEMODEL}
+
+psql -v ON_ERROR_STOP=1 --username "postgres" -d ${DBNAME} <<-EOSQL
+    ALTER DATABASE ${DBNAME} OWNER TO ${DBUSERNAME};
+    GRANT ALL PRIVILEGES ON DATABASE ${DBNAME} to ${DBUSERNAME};
+    GRANT ALL PRIVILEGES ON SCHEMA public to ${DBUSERNAME};
+    GRANT ALL PRIVILEGES
+        ON ALL TABLES IN SCHEMA public 
+        TO ${DBUSERNAME};
+EOSQL

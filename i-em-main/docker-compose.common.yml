@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  storage:
+    profiles: ["__common__"]
+    container_name: ${APP_NAME}-dbms
+    build:
+      context: ./storage/
+      dockerfile: Dockerfile
+    user: 0:${UID}
+    environment:
+      DBPORT: ${DBPORT}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
+      DBNAME: ${DBNAME}
+      DBUSERNAME: ${DBUSERNAME}
+      DBUSERPASSWORD: ${DBUSERPASSWORD}
+      DUMPPATH: ${DUMPPATH}
+      SOURCEMODEL: ${SOURCEMODEL}
+      # SOURCEDUMP: ${SOURCEDUMP}
+    ports:
+      - "${DBPORT}:5432"
+    volumes:
+      - ./storage/dumps:${DUMPPATH}:rw
+      - ./storage/scripts:/scripts:ro
+    networks:
+      default:
+        aliases:
+          - dbms.${APP_NAME}
+
+  web-api:
+    profiles: ["__common__"]
+    container_name: ${APP_NAME}-web-api
+    build:
+      context: ./web-api/
+      dockerfile: Dockerfile
+    user: 0:${UID}
+    ports:
+      - "${APIPORT}:80"
+    environment:
+      APP_NAME: ${APP_NAME}
+      DBNAME: ${DBNAME}
+      DBUSERNAME: ${DBUSERNAME}
+      DBUSERPASSWORD: ${DBUSERPASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DUMPPATH: ${DUMPPATH}
+      LOGGERS: ${LOGGERS}
+    networks:
+      default:
+        aliases:
+          - api.${APP_NAME}

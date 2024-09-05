@@ -1,0 +1,1 @@
+psql -v ON_ERROR_STOP=0 --username "postgres" -d ${DBNAME} < ${DUMPPATH}/bkp_data_2024-01-21.sql

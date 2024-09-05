@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+
+  # DEPLOY PROFILES
+
+  storage:
+    profiles: ["deploy"]
+    extends:
+      file: docker-compose.common.yml
+      service: storage
+    restart: unless-stopped
+    volumes:
+        - ./storage/dumps:${DUMPPATH}:rw
+        - ./storage/scripts:/scripts:ro
+        - ./.db/data:/var/lib/postgresql/data:rw
+
+  web-api:
+    depends_on:
+      - storage
+    profiles: ["deploy"]
+    extends:
+      file: docker-compose.common.yml
+      service: web-api
+    build:
+      context: ./web-api/
+      dockerfile: Dockerfile
+      target: deploy
+    volumes:
+      - ./web-api/logs:/logs:rw
+
+  # DEVELOPMENT PROFILES
+
+  storage-dev:
+    profiles: ["dev"]
+    extends:
+      file: docker-compose.common.yml
+      service: storage
+    volumes:
+      - ./storage/dumps:${DUMPPATH}:rw
+      - ./storage/scripts:/scripts:ro
+
+  web-api-dev:
+    depends_on:
+      - storage-dev
+    profiles: ["dev"]
+    extends:
+      file: docker-compose.common.yml
+      service: web-api
+    build:
+      context: ./web-api/
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./web-api/app:/app:ro
+      - ./web-api/logs:/logs:rw
+      - ./web-api/iemlib:/iemlib:rw
+
+  scheduler-broker:
+    image: "rabbitmq"
+    ports:
+      - "5672:5672"
+    networks:
+      default:
+        aliases:
+          - scheduler-broker.${APP_NAME}
+
+  

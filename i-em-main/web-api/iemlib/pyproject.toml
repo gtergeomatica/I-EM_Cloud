@@ -1,0 +1,27 @@
+# https://packaging.python.org/en/latest/tutorials/packaging-projects/
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "iemlib"
+version = "0.0.1"
+authors = [
+  { name="Manuele Pesenti", email="manuele.pesenti@gter.it" },
+  # ...
+]
+description = "I-EM"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "sqlalchemy",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/gtergeomatica/i-em"
+Issues = "https://github.com/gtergeomatica/i-em/issues"
